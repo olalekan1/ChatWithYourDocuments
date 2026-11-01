@@ -21,11 +21,13 @@ INSTRUCTIONS = (
 chunk_analyst_subagent = {
     "name": "chunk-analyst",
     "description": (
-        "Analyzes one retrieved documentation chunk file"
-        "Pass the user's question and one file path under /retrieved/"
+        "Analyzes one retrieved document chunk file. "
+        "Pass the user's question and one file path under /retrieved/."
     ),
     "system_prompt": CHUNK_ANALYST_INSTRUCTIONS,
 }
+
+query = "Summarise my CV and cover letter and list my most important skills and experience. Include inline links to the source documents."
 
 model = init_chat_model(
     model="openai/gpt-5-nano",
@@ -43,7 +45,6 @@ agent = create_deep_agent(
     subagents=[chunk_analyst_subagent]
 )
 
-query = "SUmmarise my CV and cover letter and provide a list of the most important skills and experience I have. Provide inline links to the source documents in your answer."
 result = agent.invoke(
     {
         "messages": [HumanMessage(content=query)]

@@ -7,21 +7,12 @@ from chatbotwithlangchain.indexing import build_vector_store
 vector_store = build_vector_store()
 backend = StateBackend()
 
-@tool
-def search_documents(query: str) -> str:
-    """
-    Searches the vector store for documents related to the query.
 
-    Args:
-        query (str): The search query.
-
-    Returns:
-        File paths of the documents that match the query saved in /retrieved/
-    """
-    retrieved_docs = vector_store.similarity_search(query, k=4)
+def retrieve_document_chunks(query: str) -> list[tuple[str, str]]:
+    """Return relevant chunks with temporary paths and their original source metadata."""
+    retrieved_docs = vector_store.similarity_search(query, k=8)
     batch_id = str(uuid.uuid4())
-    uploads: list[tuple[str, bytes]] = []
-    saved_paths: list[str] = []
+    chunks: list[tuple[str, str]] = []
 
     for index, doc in enumerate(retrieved_docs, start=1):
         path = f"retrieved/{batch_id}_chunk_{index}.txt"
@@ -30,11 +21,32 @@ def search_documents(query: str) -> str:
             f"Page: {doc.metadata['page']}\n"
             f"Content: {doc.page_content}\n\n"
         )
-        saved_paths.append(path)
-        uploads.append((path, content.encode("utf-8")))
+        chunks.append((path, content))
 
-    backend.upload_files(uploads)
-    return(
-        f"Retrieved and saved {len(saved_paths)} document chunks:\n" +
-        "\n".join(saved_paths)
+    return chunks
+
+
+@tool
+def search_documents(query: str) -> str:
+    """
+    Searches the currently indexed document corpus and saves matching chunks
+    for analysis within the agent.
+
+    Args:
+        query (str): The search query.
+
+    Returns:
+        Retrieved file paths and their source content.
+    """
+    chunks = retrieve_document_chunks(query)
+    backend.upload_files(
+        [(path, content.encode("utf-8")) for path, content in chunks]
+    )
+    return (
+        f"Retrieved and saved {len(chunks)} document chunks. "
+        "Each result includes its original source and page:\n\n"
+        + "\n".join(
+            f"Retrieved file: {path}\n{content}"
+            for path, content in chunks
+        )
     )
