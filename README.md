@@ -42,24 +42,62 @@ Indexing happens when you click **Process documents**. For each question, the ap
 
 Clone the repository and change into its root directory:
 
-```powershell
+```sh
 git clone https://github.com/olalekan1/ChatWithYourDocuments.git
 cd ChatWithYourDocuments
 ```
 
-Install `uv` if needed. On Windows, one option is:
+Install `uv` if needed. Choose the command for your platform:
+
+**Windows (PowerShell):**
 
 ```powershell
 winget install --id=astral-sh.uv -e
 ```
 
-Open a new terminal after installation, then install the project dependencies from the lock file:
+**macOS and Linux (shell):**
 
-```powershell
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Using pip:**
+
+```sh
+python -m pip install uv
+```
+
+Installing `uv` with pip is supported, though the standalone installer or your operating system's package manager is usually preferable. After installing `uv`, open a new terminal if needed, then install the project dependencies from the lock file:
+
+```sh
 uv sync
 ```
 
 `uv` will create the project virtual environment and use the Python version declared by the project. If that Python version is not installed yet, install Python 3.13 and rerun `uv sync`.
+
+### Install with pip instead of uv
+
+If you prefer not to use `uv`, create and activate a virtual environment, then install the project from the repository root. This installs the dependencies declared in `pyproject.toml`; unlike `uv sync`, pip does not use `uv.lock` to reproduce the exact locked dependency versions.
+
+**Windows (PowerShell):**
+
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+**macOS and Linux:**
+
+```sh
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+If your terminal cannot find `python3.13` (or `py -3.13` on Windows), install Python 3.13 first. After installation, start the app with `streamlit run src/chatbotwithlangchain/cli.py` from the repository root.
 
 ## Configure OpenRouter
 
@@ -98,7 +136,7 @@ src/chatbotwithlangchain/
 ├── agents.py       # Builds the Deep Agent and attaches the document search tool
 ├── cli.py          # Streamlit interface and upload/process/chat lifecycle
 ├── file_handler.py # Extracts text and source metadata from uploaded files
-├── indexing.py     # Splits documents, embeds chunks, and builds the vector store
+├── indexing.py     # Splits documents, embeds chunks, and builds the vector 
 ├── prompts.py      # Agent and chunk analyst instructions
 └── tools.py        # Search tool bound to a processed vector store
 ```
@@ -126,9 +164,3 @@ OpenRouter is an external service. The app sends document text for embedding dur
 - **No readable text:** check that the PDF contains selectable text, or try a UTF-8 encoded TXT/Markdown file.
 - **Uploads changed warning:** click **Process documents** again before asking questions about the new selection.
 - **OpenRouter/API errors:** check the key, account access, network connection, and availability/permissions for the configured models.
-
-## Public repository checklist
-
-- Never include `.env`, API keys, or other credentials in commits.
-- Only publish documents in `pdfs/` or elsewhere if you own them or have permission to share them. Use synthetic or public sample documents for a public demo; uploaded recruiter/CV material can contain personal information.
-- Do not commit generated indexes, private uploads, or other user data.
