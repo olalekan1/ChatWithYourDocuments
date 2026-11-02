@@ -97,7 +97,7 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-If your terminal cannot find `python3.13` (or `py -3.13` on Windows), install Python 3.13 first. After installation, start the app with `streamlit run src/chatbotwithlangchain/cli.py` from the repository root.
+If your terminal cannot find `python3.13` (or `py -3.13` on Windows), install Python 3.13 first. After installation, start the app with `streamlit run src/chatwithyourdocuments/cli.py` from the repository root.
 
 ## Configure OpenRouter
 
@@ -114,7 +114,7 @@ Do not commit `.env` or publish your API key. The repository's `.gitignore` alre
 From the repository root:
 
 ```powershell
-uv run streamlit run src/chatbotwithlangchain/cli.py
+uv run streamlit run src/chatwithyourdocuments/cli.py
 ```
 
 Streamlit prints a local URL (usually `http://localhost:8501`). Open it in your browser.
@@ -132,7 +132,7 @@ PDF source citations can include page numbers. Text and Markdown files are treat
 ## Project structure
 
 ```text
-src/chatbotwithlangchain/
+src/chatwithyourdocuments/
 ├── agents.py       # Builds the Deep Agent and attaches the document search tool
 ├── cli.py          # Streamlit interface and upload/process/chat lifecycle
 ├── file_handler.py # Extracts text and source metadata from uploaded files

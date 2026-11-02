@@ -2,9 +2,9 @@ import os
 from deepagents import create_deep_agent
 from langchain.chat_models import init_chat_model
 from langchain_core.vectorstores import VectorStore
-from chatbotwithlangchain.prompts import RAG_WORKFLOW_INSTRUCTIONS, CHUNK_ANALYST_INSTRUCTIONS, SUBAGENT_DELEGATION_INSTRUCTIONS
+from chatwithyourdocuments.prompts import RAG_WORKFLOW_INSTRUCTIONS, CHUNK_ANALYST_INSTRUCTIONS, SUBAGENT_DELEGATION_INSTRUCTIONS
 from dotenv import load_dotenv
-from chatbotwithlangchain.tools import backend, create_search_documents_tool
+from chatwithyourdocuments.tools import backend, create_search_documents_tool
 
 load_dotenv()
 

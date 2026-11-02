@@ -1,4 +1,4 @@
-from chatbotwithlangchain.cli import main
+from chatwithyourdocuments.cli import main
 
 
 if __name__ == "__main__":

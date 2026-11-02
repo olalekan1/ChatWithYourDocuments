@@ -7,9 +7,9 @@ import hashlib
 import streamlit as st
 from langchain.messages import HumanMessage
 from dotenv import load_dotenv
-from chatbotwithlangchain.file_handler import uploaded_file_to_document
-from chatbotwithlangchain.agents import build_agent
-from chatbotwithlangchain.indexing import build_vector_store
+from chatwithyourdocuments.file_handler import uploaded_file_to_document
+from chatwithyourdocuments.agents import build_agent
+from chatwithyourdocuments.indexing import build_vector_store
 
 
 load_dotenv()
