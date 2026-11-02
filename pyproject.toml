@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-chatwithyourdocuments = "chatwithyourdocuments.cli:main"
+chatwithyourdocuments = "chatwithyourdocuments.launcher:main"
 
 [build-system]
 requires = ["uv_build>=0.12.18,<0.13.0"]

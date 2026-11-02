@@ -97,7 +97,7 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-If your terminal cannot find `python3.13` (or `py -3.13` on Windows), install Python 3.13 first. After installation, start the app with `streamlit run src/chatwithyourdocuments/cli.py` from the repository root.
+If your terminal cannot find `python3.13` (or `py -3.13` on Windows), install Python 3.13 first.
 
 ## Configure OpenRouter
 
@@ -111,13 +111,18 @@ Do not commit `.env` or publish your API key. The repository's `.gitignore` alre
 
 ## Run the app
 
-From the repository root:
+From the repository root, start the app with:
 
-```powershell
-uv run streamlit run src/chatwithyourdocuments/cli.py
+```sh
+uv run chatwithyourdocuments
 ```
 
 Streamlit prints a local URL (usually `http://localhost:8501`). Open it in your browser.
+Stop the server with `Ctrl+C`. Streamlit options can be passed after the command, for example:
+
+```sh
+uv run chatwithyourdocuments --server.port 8502
+```
 
 ### Using the app
 
