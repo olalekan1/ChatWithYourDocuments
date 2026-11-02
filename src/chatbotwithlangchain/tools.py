@@ -1,52 +1,56 @@
 import uuid
+
 from deepagents.backends import StateBackend
 from langchain.tools import tool
-from chatbotwithlangchain.indexing import build_vector_store
+from langchain_core.vectorstores import VectorStore
 
 
-vector_store = build_vector_store()
 backend = StateBackend()
 
 
-def retrieve_document_chunks(query: str) -> list[tuple[str, str]]:
-    """Return relevant chunks with temporary paths and their original source metadata."""
-    retrieved_docs = vector_store.similarity_search(query, k=8)
-    batch_id = str(uuid.uuid4())
-    chunks: list[tuple[str, str]] = []
+def create_search_documents_tool(vector_store: VectorStore):
+    """Create a search tool bound to one processed document index."""
 
-    for index, doc in enumerate(retrieved_docs, start=1):
-        path = f"retrieved/{batch_id}_chunk_{index}.txt"
-        content=(
-            f"Source: {doc.metadata['source']}\n"
-            f"Page: {doc.metadata['page']}\n"
-            f"Content: {doc.page_content}\n\n"
+    @tool
+    def search_documents(query: str) -> str:
+        """
+        Search the processed document index and save matching chunks
+        for analysis within the agent.
+
+        Args:
+            query: A question or focused search query about the documents.
+
+        Returns:
+            Retrieved file paths and their source content.
+        """
+        retrieved_docs = vector_store.similarity_search(query, k=5)
+        batch_id = uuid.uuid4().hex
+        uploads: list[tuple[str, bytes]] = []
+        results: list[str] = []
+
+        for index, doc in enumerate(retrieved_docs, start=1):
+            path = f"retrieved/{batch_id}_chunk_{index}.txt"
+            source = doc.metadata.get("source", "unknown")
+            page = doc.metadata.get("page")
+            page_line = f"Page: {page}\n" if page is not None else ""
+            content = (
+                f"Source: {source}\n"
+                f"{page_line}"
+                f"Content: {doc.page_content}\n"
+            )
+            uploads.append((path, content.encode("utf-8")))
+            results.append(f"Retrieved file: {path}\n{content}")
+
+        if uploads:
+            backend.upload_files(uploads)
+
+        if not results:
+            return "No matching document chunks were found."
+
+        return (
+            f"Retrieved and saved {len(results)} document chunks. "
+            "Each result includes its original source and page when available:\n\n"
+            + "\n".join(results)
         )
-        chunks.append((path, content))
 
-    return chunks
-
-
-@tool
-def search_documents(query: str) -> str:
-    """
-    Searches the currently indexed document corpus and saves matching chunks
-    for analysis within the agent.
-
-    Args:
-        query (str): The search query.
-
-    Returns:
-        Retrieved file paths and their source content.
-    """
-    chunks = retrieve_document_chunks(query)
-    backend.upload_files(
-        [(path, content.encode("utf-8")) for path, content in chunks]
-    )
-    return (
-        f"Retrieved and saved {len(chunks)} document chunks. "
-        "Each result includes its original source and page:\n\n"
-        + "\n".join(
-            f"Retrieved file: {path}\n{content}"
-            for path, content in chunks
-        )
-    )
+    return search_documents

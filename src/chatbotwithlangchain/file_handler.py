@@ -1,3 +1,4 @@
+import io
 from pathlib import Path
 from typing import List
 from langchain_core.documents import Document
@@ -50,5 +51,41 @@ def read_multiple_pdfs(file_paths: List[str|Path]) -> List[Document]:
                     }
                 )
             )
+
+    return documents
+
+
+def uploaded_file_to_document(uploaded_file) -> list[Document]:
+    """Extract a supported Streamlit upload into source-aware documents."""
+    raw_data = uploaded_file.getvalue()
+    filename = uploaded_file.name
+    suffix = Path(filename).suffix.lower()
+
+    if suffix == ".pdf":
+        reader = PdfReader(io.BytesIO(raw_data))
+        documents = [
+            Document(
+                page_content=text,
+                metadata={
+                    "source": filename,
+                    "filename": filename,
+                    "page": page_number,
+                    "total_pages": len(reader.pages),
+                },
+            )
+            for page_number, page in enumerate(reader.pages, start=1)
+            if (text := (page.extract_text() or "")).strip()
+        ]
+    else:
+        text = raw_data.decode("utf-8", errors="replace")
+        documents = [
+            Document(
+                page_content=text,
+                metadata={"source": filename, "filename": filename},
+            )
+        ] if text.strip() else []
+
+    if not documents:
+        raise ValueError(f"No readable text was found in {filename}.")
 
     return documents
